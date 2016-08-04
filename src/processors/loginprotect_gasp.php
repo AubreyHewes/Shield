@@ -12,6 +12,12 @@ class ICWP_WPSF_Processor_LoginProtect_Gasp extends ICWP_WPSF_Processor_BaseWpsf
 		/** @var ICWP_WPSF_FeatureHandler_LoginProtect $oFO */
 		$oFO = $this->getFeatureOptions();
 
+		if ( $oFO->getIsGoogleRecaptchaReady() ) {
+			// no need for human check if using g-recaptcha ...? removes superfluous ux check...
+			return;
+			// else require a human check
+		}
+
 		// Add GASP checking to the login form.
 		add_action( 'login_form',				array( $this, 'printGaspLoginCheck_Action' ), 100 );
 		add_action( 'woocommerce_login_form',	array( $this, 'printGaspLoginCheck_Action' ) );
@@ -25,7 +31,7 @@ class ICWP_WPSF_Processor_LoginProtect_Gasp extends ICWP_WPSF_Processor_BaseWpsf
 			//print the checkbox code:
 			add_action( 'register_form',		array( $this, 'printGaspLoginCheck_Action' ) );
 			add_action( 'lostpassword_form',	array( $this, 'printGaspLoginCheck_Action' ) );
-			
+
 			//verify the checkbox is present:
 			add_action( 'register_post',		array( $this, 'checkRegisterForGasp_Action' ), 10, 1 );
 			add_action( 'lostpassword_post',	array( $this, 'checkResetPasswordForGasp_Action' ), 10, 1 );
@@ -100,7 +106,7 @@ class ICWP_WPSF_Processor_LoginProtect_Gasp extends ICWP_WPSF_Processor_BaseWpsf
 
 		$sUniqId = uniqid();
 		$sUniqElem = 'icwp_wpsf_login_p'.$sUniqId;
-		
+
 		$sStyles = '
 			<style>
 				#'.$sUniqElem.' {
@@ -116,7 +122,7 @@ class ICWP_WPSF_Processor_LoginProtect_Gasp extends ICWP_WPSF_Processor_BaseWpsf
 				}
 			</style>
 		';
-	
+
 		$sHtml =
 			$sStyles.
 			'<p id="'.$sUniqElem.'" class="icwpImHuman_'.$sUniqId.'"></p>
